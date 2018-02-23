@@ -64,9 +64,14 @@ export class BuildOnScanSuccessStatus implements StatusSuccessHandler {
             const id = new GitHubRepoRef(commit.repo.owner, commit.repo.name, commit.sha);
             const creds = {token: params.githubToken};
 
+            const allBranchesThisCommitIsOn = commit.pushes.map(p => p.branch);
+            const theDefaultBranchIfThisCommitIsOnIt = allBranchesThisCommitIsOn.find(b => b === commit.repo.defaultBranch);
+            const someBranchIDoNotReallyCare = allBranchesThisCommitIsOn.find(b => true);
+            const branchToMarkTheBuildWith = theDefaultBranchIfThisCommitIsOnIt || someBranchIDoNotReallyCare || "master";
+
             // the builder is expected to result in a complete Build event (which will update the build status)
             // and an ImageLinked event (which will update the artifact status).
-            return params.builder.initiateBuild(creds, id, addressChannelsFor(commit.repo, ctx), team);
+            return params.builder.initiateBuild(creds, id, addressChannelsFor(commit.repo, ctx), team, { branch: branchToMarkTheBuildWith });
         });
         return Success;
     }

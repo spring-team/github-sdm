@@ -1,6 +1,10 @@
 
 subscription OnAnySuccessStatus {
     Status(state: success) {
+        state
+        targetUrl
+        context
+        description
         commit {
             sha
             message
@@ -13,6 +17,7 @@ subscription OnAnySuccessStatus {
             repo {
                 owner
                 name
+                defaultBranch
                 channels {
                     name
                     id
@@ -31,9 +36,5 @@ subscription OnAnySuccessStatus {
                 imageName
             }
         }
-        state
-        targetUrl
-        context
-        description
     }
 }

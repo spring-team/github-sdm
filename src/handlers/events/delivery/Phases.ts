@@ -131,7 +131,7 @@ export function previousPhaseSucceeded(expectedPhases: Phases, currentPhase: Git
         return false;
     }
     if(status.targetUrl.endsWith(ApprovalGateParam)) {
-        logger.info(`Approval gate detected in ${status.context}`)
+        logger.info(`Approval gate detected in ${status.context}`);
         return false;
     }
 
