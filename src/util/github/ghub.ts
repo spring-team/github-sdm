@@ -1,6 +1,7 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
+import * as stringify from "json-stringify-safe";
 
 export type State = "error" | "failure" | "pending" | "success";
 
@@ -60,7 +61,14 @@ export function deleteRepository(token: string, rr: GitHubRepoRef): AxiosPromise
         .catch(err => {
                 logger.error(err.message);
                 logger.error(err.response.body);
-                return Promise.reject(new Error(`Error hitting ${url} to delete repo`));
+                if (err.response.status === 403) {
+                    console.log("403 headers: " + stringify(err.response.headers));
+                    return fetchScopes(token, rr.apiBase).then(scopes => {
+                        logger.info("Scopes were: " + scopes);
+                        return Promise.reject(new Error("Unauthorized. do you have admin rights on this repo?"));
+                    });
+                }
+                return Promise.reject(new Error(`Error hitting ${url} to delete repo: ` + err.message));
             },
         );
 }
@@ -90,6 +98,15 @@ export interface GitHubCommitsBetween {
         author: { login: string };
         commit: { message: string };
     }>;
+}
+
+function fetchScopes(token: string, apiBase: string) {
+    const config = authHeaders(token);
+    const url = `${apiBase}/user`;
+    return axios.get(url, config)
+        .then(ap => {
+            console.log("Headers: " + stringify(ap.headers));
+            return ap.headers['X-OAuth-Scopes']});
 }
 
 export function listCommitsBetween(token: string, rr: GitHubRepoRef, startSha: string, end: string): Promise<GitHubCommitsBetween> {

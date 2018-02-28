@@ -47,7 +47,8 @@ function disposeHandle(ctx: HandlerContext, params: DisposeParameters): Promise<
     const id = new GitHubRepoRef(params.owner, params.repo);
     const creds = {token: params.githubToken};
     return disposeOfProject(creds, id)
-        .then(() => ctx.messageClient.respond("Repository deleted."))
+        .then(() => ctx.messageClient.respond("Repository deleted."),
+            err => ctx.messageClient.respond("Failed to dispose of project: " + err.message))
         .then(success);
 }
 
