@@ -30,20 +30,20 @@ import { sendFingerprint } from "../../../../../util/webhook/sendFingerprint";
 import { ExecuteGoalInvocation } from "../../ExecuteGoalOnSuccessStatus";
 
 export function executeFingerprints(...fingerprinters: Fingerprinter[]):
-(status: OnAnyPendingStatus.Status, ctx: HandlerContext, params: ExecuteGoalInvocation) => Promise<HandlerResult> {
-    return async (status: OnAnyPendingStatus.Status, ctx: HandlerContext, params: ExecuteGoalInvocation) => {
+(status: OnAnyPendingStatus.Status, context: HandlerContext, params: ExecuteGoalInvocation) => Promise<HandlerResult> {
+    return async (status: OnAnyPendingStatus.Status, context: HandlerContext, params: ExecuteGoalInvocation) => {
         const id = new GitHubRepoRef(status.commit.repo.owner, status.commit.repo.name, status.commit.pushes[0].after.sha);
         const credentials = { token: params.githubToken };
 
         if (fingerprinters.length >= 0) {
-            const project = await GitCommandGitProject.cloned(credentials, id);
+            const project = await GitCommandGitProject.cloned({ credentials, context, id});
             const fingerprints: Fingerprint[] = await Promise.all(
                 fingerprinters.map(async fp => {
                     const f = await fp(project);
                     return isFingerprint(f) ? [f] : f;
                 }),
             ).then(x2 => _.flatten(x2));
-            await fingerprints.map(fingerprint => sendFingerprint(id, fingerprint, ctx.teamId));
+            await fingerprints.map(fingerprint => sendFingerprint(id, fingerprint, context.teamId));
         }
         createStatus(params.githubToken, id, {
             context: params.goal.context,
