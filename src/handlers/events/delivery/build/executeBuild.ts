@@ -10,21 +10,20 @@ import { ExecuteGoalInvocation } from "../ExecuteGoalOnSuccessStatus";
 
 export function executeBuild(...conditionalBuilders: ConditionalBuilder[]) {
 
-    return async (status: OnAnyPendingStatus.Status, ctx: HandlerContext, params: ExecuteGoalInvocation) => {
+    return async (status: OnAnyPendingStatus.Status, context: HandlerContext, params: ExecuteGoalInvocation) => {
         const commit = status.commit;
         await dedup(commit.sha, async () => {
             const credentials = {token: params.githubToken};
             const id = new GitHubRepoRef(commit.repo.owner, commit.repo.name, commit.sha);
             const team = commit.repo.org.chatTeam.id;
 
-            const project = await GitCommandGitProject.cloned(credentials, id);
-
+            const project = await GitCommandGitProject.cloned({ credentials, context, id});
             const i: PushTestInvocation = {
                 id,
                 project,
                 credentials,
-                context: ctx,
-                addressChannels: addressChannelsFor(commit.repo, ctx),
+                context,
+                addressChannels: addressChannelsFor(commit.repo, context),
                 // TODO flesh this out properly
                 push: {
                     id: null,

@@ -107,7 +107,7 @@ export class OnPendingReviewStatus implements HandleEvent<OnAnyPendingStatus.Sub
         const addressChannels = addressChannelsFor(commit.repo, context);
         try {
             if (params.reviewerRegistrations.length > 0) {
-                const project = await GitCommandGitProject.cloned(credentials, id);
+                const project = await GitCommandGitProject.cloned({ credentials, context, id});
                 const relevantReviewers = await toRelevantReviewers(params.reviewerRegistrations, project);
                 const reviewsAndErrors: Array<{ review?: ProjectReview, error?: ReviewerError }> =
                     await Promise.all(relevantReviewers

@@ -74,7 +74,7 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
         const commit = push.commits[0];
         const id = new GitHubRepoRef(push.repo.owner, push.repo.name, commit.sha);
         const credentials = {token: params.githubToken};
-        const project = await GitCommandGitProject.cloned(credentials, id);
+        const project = await GitCommandGitProject.cloned({ credentials, context, id});
         const addressChannels = addressChannelsFor(push.repo, context);
         const pi: PushTestInvocation = {
             id,

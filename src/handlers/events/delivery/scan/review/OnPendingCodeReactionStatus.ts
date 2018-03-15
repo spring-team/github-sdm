@@ -82,7 +82,7 @@ export class OnPendingCodeReactionStatus implements HandleEvent<OnAnyPendingStat
         const addressChannels = addressChannelsFor(commit.repo, context);
         try {
             if (params.codeReactions.length > 0) {
-                const project = await GitCommandGitProject.cloned(credentials, id);
+                const project = await GitCommandGitProject.cloned({ credentials, context, id});
                 const push = commit.pushes[0];
                 const filesChanged = push.before ? await filesChangedSince(project, push.before.sha) : [];
 
