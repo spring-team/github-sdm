@@ -1,0 +1,10 @@
+applications:
+- name: github-sdm
+  command: "node node_modules/@atomist/automation-client/start.client.js"
+  memory: 512M
+  routes:
+  - route: lifecycle.atomist.io
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+  env:
+    SUPPRESS_NO_CONFIG_WARNING: true
+    ATOMIST_TEAMS: T5964N9B7
