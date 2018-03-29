@@ -21,7 +21,7 @@ import { K8sAutomationBuilder } from "../../common/delivery/build/k8s/K8Automati
 import { HttpServiceGoals, LocalDeploymentGoals } from "../../common/delivery/goals/common/httpServiceGoals";
 import { LibraryGoals } from "../../common/delivery/goals/common/libraryGoals";
 import { NpmBuildGoals, NpmDeployGoals } from "../../common/delivery/goals/common/npmGoals";
-import {FromAtomist, toBranch, ToDefaultBranch, ToPublicRepo} from "../../common/listener/support/pushtest/commonPushTests";
+import { FromAtomist, toBranch, ToDefaultBranch, ToPublicRepo } from "../../common/listener/support/pushtest/commonPushTests";
 import { IsDeployEnabled } from "../../common/listener/support/pushtest/deployPushTests";
 import { IsMaven } from "../../common/listener/support/pushtest/jvm/jvmPushTests";
 import { MaterialChangeToJavaRepo } from "../../common/listener/support/pushtest/jvm/materialChangeToJavaRepo";
@@ -45,7 +45,7 @@ import { addJavaSupport, JavaSupportOptions } from "../parts/stacks/javaSupport"
 import { addNodeSupport } from "../parts/stacks/nodeSupport";
 import { addSpringSupport } from "../parts/stacks/springSupport";
 import { addTeamPolicies } from "../parts/team/teamPolicies";
-import {DoNotSetAnyGoals} from "../../common/listener/PushMapping";
+import { DoNotSetAnyGoals } from "../../common/listener/PushMapping";
 
 export type K8sMachineOptions = SoftwareDeliveryMachineOptions & JavaSupportOptions;
 
@@ -53,8 +53,8 @@ export function k8sSoftwareDeliveryMachine(opts: K8sMachineOptions): SoftwareDel
     const sdm = new SoftwareDeliveryMachine(
         "K8s software delivery machine",
         opts,
-        whenPushSatisfies(not(toBranch("deploy-me")))
-            .itMeans("try not to conflict with the one I'm deploying to k8s")
+        whenPushSatisfies(toBranch("deploy-me"))
+            .itMeans("try not to conflict with the one deploying me")
             .setGoals(DoNotSetAnyGoals),
         whenPushSatisfies(
             ToDefaultBranch,
@@ -88,7 +88,7 @@ export function k8sSoftwareDeliveryMachine(opts: K8sMachineOptions): SoftwareDel
             () => addK8sSpec,
             () => enableDeploy(),
             () => disableDeploy(),
-        )
+    )
         .addSupportingEvents(() => NoticeK8sTestDeployCompletion,
             () => NoticeK8sProdDeployCompletion)
         .addEndpointVerificationListeners(
@@ -97,7 +97,7 @@ export function k8sSoftwareDeliveryMachine(opts: K8sMachineOptions): SoftwareDel
                 maxTimeout: 5000,
                 minTimeout: 3000,
             }),
-        );
+    );
 
     addJavaSupport(sdm, opts);
     addSpringSupport(sdm, opts);
