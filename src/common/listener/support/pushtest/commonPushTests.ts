@@ -21,6 +21,10 @@ import { PredicatePushTest, predicatePushTest, PushTest, pushTest } from "../../
 export const ToDefaultBranch: PushTest = pushTest("Push to default branch", async p =>
     p.push.branch === p.push.repo.defaultBranch);
 
+export function toBranch(branchName: string): PushTest {
+    return pushTest(`Push to ${branchName} branch`, async p =>
+        p.push.branch === branchName);
+}
 /**
  * Is this a push originated by Atomist? Note that we can't look at the committer,
  * as if a user invoked a command handler, their credentials will be used
