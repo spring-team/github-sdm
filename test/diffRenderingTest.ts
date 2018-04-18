@@ -21,7 +21,7 @@ import {renderCommitMessage} from "../src/util/slack/diffRendering";
 describe("commit rendering", () => {
 
     it("can render a commit", () => {
-
+        const x = 1;
         const text = renderCommitMessage({ owner: "somewhere", name: "over" }, {
             sha: "blue",
             message: "a stripe, it's pretty",
